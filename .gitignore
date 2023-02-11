@@ -1,0 +1,13 @@
+#Paths que se van a ignorar:
+
+modulos_de_control/__pycache__/*
+
+modulos_de_control/Modulos/Datos/*
+
+modulos_de_control/Modulos/__pycache__/*
+
+!modulos_de_control/Modulos/Datos/Plantillas/* 
+
+Proyecto Email/*
+
+Sobre el proyecto/*
