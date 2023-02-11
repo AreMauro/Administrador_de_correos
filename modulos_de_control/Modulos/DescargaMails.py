@@ -2,7 +2,7 @@ from imbox import Imbox
 
 import os
 
-from pathlib import PurePath
+from pathlib import Path
 
 from modulos_de_control.Modulos.DatosConexion import (
                                 Carga_de_Datos)
@@ -16,10 +16,53 @@ from modulos_de_control.Modulos.Utilerias import (
                                 clear, 
                                 Mensajes)
 
+from pprint import pprint
+
+def Archivos_directorio(directorio: Path):
+
+    return [ el.name 
+            for el 
+            in list(directorio.iterdir())]
+
+def Cambiar_nombre(name_file : str,
+                    directorio : Path) -> str:
+
+    Existe = True
+
+    archivos = Archivos_directorio(directorio)
+
+    contador = 0
+
+    while Existe:
+
+        if name_file not in archivos:
+
+            return name_file
+
+        else:
+            
+            punto = name_file.find(".")
+
+            nombre_archivo = name_file [:punto]
+
+            nombre_archivo += f"({contador})"
+
+            nombre_archivo += name_file [punto :]
+
+            if nombre_archivo in archivos:
+
+                    contador += 1
+
+                    Existe = True
+            
+            else:
+
+                return nombre_archivo
+
 def Descargardor(Correo: str,
                 Claves: dict) -> None:
 
-    Folder_destino = PurePath("C:\\Users\\Ivan\\Downloads\Desktop\\Descargas")
+    Folder_destino = Path("C:\\Users\\Ivan\\Downloads\Desktop\\Descargas")
 
     mail = Imbox(Claves["proveedor"], username=Claves["username"], password=Claves["password"], ssl = True, ssl_context = None, starttls=False)
 
@@ -32,10 +75,13 @@ def Descargardor(Correo: str,
 
             att_fn = attachment.get("filename")
 
-            print(f"Descargando {att_fn} en {Folder_destino}")
-            
-            DirDESCARGA = str(Folder_destino)+"\\"+att_fn
-            
+            file_name = Cambiar_nombre(att_fn,
+                                    Folder_destino)
+
+            print(f"Descargando {file_name} en {Folder_destino}")
+
+            DirDESCARGA = str(Folder_destino)+"\\" + file_name 
+                
             with open(DirDESCARGA,"wb") as recibo:
 
                 recibo.write(attachment.get("content").read())
