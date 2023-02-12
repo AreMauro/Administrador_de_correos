@@ -4,7 +4,9 @@ modulos_de_control/__pycache__/*
 
 modulos_de_control/Modulos/Datos/Direcciones de correo/*
 
-modulos_de_control/Modulos/Datos/**
+modulos_de_control/Modulos/Datos/Credenciales.json
+
+modulos_de_control/Modulos/Datos/Patrones.json
 
 modulos_de_control/Modulos/__pycache__/*
 
