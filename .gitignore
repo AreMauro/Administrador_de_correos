@@ -2,9 +2,9 @@
 
 modulos_de_control/__pycache__/*
 
-!(modulos_de_control/Modulos/Datos/Plantillas/*)
+modulos_de_control/Modulos/Datos/Direcciones de correo/*
 
-modulos_de_control/Modulos/Datos/*
+modulos_de_control/Modulos/Datos/**
 
 modulos_de_control/Modulos/__pycache__/*
 
