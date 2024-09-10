@@ -1,26 +1,52 @@
-
+from cuentaCorreo import cuentaDeCorreo
 
 class Usuario:
 
     def __init__(self, username, password):
 
-        self.USERNAME = username
+        if (any(char.isspace for char in username)) == False and len(username) > 5:
+            
+            self.USERNAME = username
+        else:
 
-        self._PASS = password
+            raise Exception("")
 
-    def getUsername():
+        if cuentaDeCorreo._verificadordeContrasegna(password) == True and len(password) > 0:
+
+            self._PASS = password
+
+        else:
+
+            print("Contraseña invalida.\nUse caracteres especiale, numeros y mayusculas.")
+
+    @property
+    def username(self):
 
         return self.USERNAME
 
-    def getPassword():
+    @property
+    def password(self):
 
         return self._PASS
 
-    def setUsername(username:str):
+    @username.setter
+    def username(self, username:str):
 
-        self.USERNAME = username
+        if (any(char.isspace for char in username)) == False and len(username) > 5:
+            
+            self.USERNAME = username
     
-    def setPassword(password: str):
+    @password.setter
+    def password(self, password: str):
 
-        self._PASS = password
+        if cuentaDeCorreo._verificadordeContrasegna(password) == True and len(password) > 0:
 
+            self._PASS = password
+
+        else:
+
+            print("Contraseña invalida.\nUse caracteres especiale, numeros y mayusculas.")
+
+    def __str__():
+
+        return f"Cuenta: {self.USERNAME}"
