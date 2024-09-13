@@ -1,52 +1,53 @@
-from cuentaCorreo import cuentaDeCorreo
-
 class Usuario:
 
     def __init__(self, username, password):
 
-        if (any(char.isspace for char in username)) == False and len(username) > 5:
-            
-            self.USERNAME = username
-        else:
-
-            raise Exception("")
-
-        if cuentaDeCorreo._verificadordeContrasegna(password) == True and len(password) > 0:
-
-            self._PASS = password
-
-        else:
-
-            print("Contraseña invalida.\nUse caracteres especiale, numeros y mayusculas.")
+        
+        self.USERNAME = username
+        self._PASS = password
 
     @property
-    def username(self):
+    def username(self) -> str:
 
         return self.USERNAME
 
     @property
-    def password(self):
+    def password(self) -> str:
 
         return self._PASS
 
-    @username.setter
-    def username(self, username:str):
+    @staticmethod
+    def _verificadordeContrasegna(contrasegna: str) ->bool:
 
-        if (any(char.isspace for char in username)) == False and len(username) > 5:
+        if any(char.isdigit() for char in contrasegna) == True and any(char.isupper() for char in contrasegna) == True and any(char.isspace() for char in contrasegna) == False and  any(char in strs.punctuation for char in contrasegna)== True:
+
+           return True
+    
+        else:
+                return False
+
+    @username.setter
+    def username(self, username:str) -> None:
+
+        if (any(char.isspace() for char in username)) == False and len(username) > 5:
             
             self.USERNAME = username
     
     @password.setter
-    def password(self, password: str):
+    def password(self, password: str) -> None:
 
-        if cuentaDeCorreo._verificadordeContrasegna(password) == True and len(password) > 0:
+        if self._verificadordeContrasegna(password) == True and len(password) > 10:
 
             self._PASS = password
 
         else:
 
-            print("Contraseña invalida.\nUse caracteres especiale, numeros y mayusculas.")
+            print("Contraseña invalida.\nUse caracteres especiale, numeros y mayusculas y la longitud debe ser de 10 o mas caracteres")
 
-    def __str__():
+    def __str__(self):
 
         return f"Cuenta: {self.USERNAME}"
+    
+    def __repr__(self):
+        cl = self.__class__.__name__
+        return f"{cl}: usuario = {self.USERNAME}"
