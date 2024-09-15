@@ -1,6 +1,6 @@
 import re
 import imaplib
-from Usuario import Usuario
+from emailConection import emailConection
 
 
 class cuentaDeCorreo:
@@ -45,6 +45,10 @@ class cuentaDeCorreo:
 
         else:
             raise Exception("Error el smtp es incorrecto")
+        
+        self._conexion = emailConection(self._correo, self._password,
+                              self._puerto, self._smtp
+                              ).getConection()
 
         
     @property
@@ -102,13 +106,10 @@ class cuentaDeCorreo:
     @password.setter
     def password(self, Nuevapassword) ->None:
 
-        if len(Nuevapassword) > 10 and Usuario._verificadordeContrasegna(Nuevapassword) == True:
-
+        if any(char.isspace() for char in Nuevapassword) == False and len(Nuevapassword) >=  5:
+            
             self._password = Nuevapassword
 
-        else:
-            print("Esta usando espacios o no esta usando numeros, caracteres especiales o mayusculas o la longitud es menor a 10")
-    
 
     @correo.setter
     def correo(self, email) ->None:
@@ -149,62 +150,113 @@ class cuentaDeCorreo:
 
         self._smtp = nuevoSMTP
 
+    def getConection(self) :
+
+        return self._conexion
     
+    def closeConection(self) -> tuple:
+        
+        close = self._conexion.close()[0]
+
+        logout = self._conexion.logout()[0]
+
+        return (close, logout)
+
+
     def getEmailsByAddress(self, correo) ->list:
 
-        nuevaconexion = imaplib.IMAP4_SSL( self._smtp, self._puerto)
-        
-        nuevaconexion.login(self._correo, self._password)
-
-        conexion = nuevaconexion.select("INBOX")
-
-        Status, mensajes = nuevaconexion.search(None, f'FROM {correo}')
+        Status, mensajes = self.getConection().search(None, f'FROM {correo}')
 
         mensajes = [x for x in mensajes[0].split()]
 
-        nuevaconexion.close()
-
-        nuevaconexion.logout()
-        
         return mensajes
 
- 
+
+    def getAllEmails(self) ->list:
+
+        Status, mensajes = self.getConection().search(None, "ALL")
+
+        mensajes = [x for x in mensajes[0].split()]
+
+        return mensajes
+
     def getEmailsByDateAndAddress(self, correo: str,
                                 fecha: str) -> list:
+        """
+            OBTIENE LOS MAILS DE UNA DIRECCION DE CORREO ESPECIFICA Y DE UNA FECHA IGUAL O POSTERIOR A FECHA.
 
-        nuevaconexion = imaplib.IMAP4_SSL(self._smtp self._puerto)
+        """
 
-        nuevaconexion.login(self._correo, self._password)
-    
-        mails = nuevaconexion.select("INBOX")
-
-        Status, mensajes = nuevaconexion.search(None, f'FROM {correo} BEFORE {fecha}')
+        Status, mensajes = self.getConection().search(None, f'FROM {correo} SINCE {fecha}')
 
         mensajes = [x for x in mensajes[0].split()]
+
+        return mensajes
+
+    def getEmailsBeforeDate(self, fecha: str) -> list:
+
+        """
+            OBTIENE SOLO LOS EMAILS ANTERIORES A UNA FECHA ESPECIFICA
+        """
+        Status, mensajes = self.getConection().search(None, f'BEFORE {fecha}')
+
+        mensajes = [x for x in mensajes[0].split()]
+
+        return mensajes
+
+    def getEmailsAfterDate(self, fecha: str) -> list:
+
+        """
+            OBTIENE SOLO LOS EMAILS POSTERIORES A UNA FECHA ESPECIFICA
+            
+        """
+
+        Status, mensajes = self.getConection().search(None, f'SINCE {fecha}')
+
+        mensajes = [x for x in mensajes[0].split()]
+
+        return mensajes
+
+    def Eliminar_spam(self, proveedor) -> None:
+
+        nuevaconexion = imaplib.IMAP4_SSL(self._smtp, self._puerto)
+
+        nuevaconexion.login(self._correo, self._password)
+
+        mails = nuevaconexion.select(f"[{proveedor}]/Spam")
+
+        Status, mensajes = nuevaconexion.search(None, 'All')
+
+        mensajes = [x for x in mensajes[0].split()]
+
+        MensajesHallados = len(mensajes)
+
+        print(f"\n\nEliminando los correos spam\n\n")
+
+        print(f"Se encontraron {MensajesHallados} mensajes\n")
+
+        mailseliminados = 0
+
+        for mail in mensajes:
+
+            mailseliminados += 1
+
+            nuevaconexion.store(mail,"+FLAGS", "\\Deleted")
+
+            if mailseliminados % 2 == 0:
+                
+                porcentajeProgreso = (mailseliminados/MensajesHallados)*100
+
+                print(f"Progreso: {round(porcentajeProgreso, 2)}%")
+        
+        print("Operacion completada!!!")
+
+        nuevaconexion.expunge()
 
         nuevaconexion.close()
 
         nuevaconexion.logout()
 
-        return mensajes
-
-    def getEmailsbyDate(self, fecha: str) -> list
-
-        nuevaconexion = imaplib.IMAP4_SSL(self._smtp self._puerto)
-
-        nuevaconexion.login(self._correo, self._password)
-    
-        mails = nuevaconexion.select("INBOX")
-
-        Status, mensajes = nuevaconexion.search(None, f'BEFORE {fecha}')
-
-        mensajes = [x for x in mensajes[0].split()]
-
-        nuevaconexion.close()
-
-        nuevaconexion.logout()
-
-        return mensajes
 
     def __str__(self):
         return f"Mi cuenta es {self._correo}, con usuario: {self._usuario} y proveedor: {self.proveedor}"

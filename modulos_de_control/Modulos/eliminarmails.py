@@ -1,11 +1,14 @@
 import imaplib
+from cuentaCorreo import cuentaDeCorreo
+from Email import Email
+
 
 import email
 
-from modulos_de_control.Modulos.DatosConexion import (
+from DatosConexion import (
                                 Carga_de_Datos)
 
-from modulos_de_control.Modulos.emaildresses import (
+from emaildresses import (
                 Obtener_correos_spam, 
                 Eliminar_Archivos_Temporales)
 
@@ -13,7 +16,7 @@ from pathlib import Path
 
 from json import load
 
-from modulos_de_control.Modulos.Utilerias import (
+from Utilerias import (
                         Mensajes, 
                         clear)
 
@@ -24,129 +27,65 @@ Raiz = Path("C:\\Users\\Ivan\\Downloads\\Desktop\\Proyectos\\modulos_de_control\
 
 def EliminarMailsporFechaycorreo(correo: str,
                                 fecha: str,
-                                Claves: dict) -> None:
-
-    nuevaconexion = imaplib.IMAP4_SSL(Claves["proveedor"], int(Claves["puerto"]))
-
-    nuevaconexion.login(Claves["username"], Claves["password"])
+                                nuevaCuenta: cuentaDeCorreo) -> None:
     
-    mails = nuevaconexion.select("INBOX")
+    emails = nuevaCuenta.getEmailsByDateAndAddress(correo, fecha)
 
-    Status, mensajes = nuevaconexion.search(None, f'FROM {correo} BEFORE {fecha}')
+    emailsHallados = len(emails)
 
-    mensajes = [x for x in mensajes[0].split()]
+    print(f"Se hallaron {emailsHallados} mails.")
 
-    MensajesHallados = len(mensajes)
+    mailsEliminados = 0
 
-    print(f"Se encontraron {MensajesHallados} mensajes")
+    for email in emails:
+        
+        emailActual = Email(nuevaCuenta, email)
 
-    mailseliminados = 0
+        nombre = emailActual.getSender()
 
-    porcentajeProgreso = 0
+        if nombre == correo:
 
-    for mail in mensajes:
+            emailActual.EliminarEmail()
 
-        mailseliminados += 1
+        mailsEliminados += 1
 
-        nuevaconexion.store(mail,"+FLAGS", "\\Deleted")
+        if mailsEliminados % 10 == 0:
 
-        if mailseliminados % 2 == 0:
-            
-            porcentajeProgreso = (mailseliminados/MensajesHallados)*100
-
-            print(f"Progreso: {porcentajeProgreso}%")
-
-    nuevaconexion.expunge()
-
-    nuevaconexion.close()
-
-    nuevaconexion.logout()
+            print(f"{round(mailsEliminados/emailsHallados, 4)*100}% completado")
 
 
 def EliminarMailsporcorreo(correo: str,
-                        Claves: dict) -> None:
+                           nuevaCuenta: cuentaDeCorreo) -> None:
 
-    nuevaconexion = imaplib.IMAP4_SSL(Claves["proveedor"], int(Claves["puerto"]))
+    emails = nuevaCuenta.getEmailsByAddress(correo)
 
-    nuevaconexion.login(Claves["username"], Claves["password"])
-    
-    mails = nuevaconexion.select("INBOX")
+    mailsEliminados = 0
 
-    Status, mensajes = nuevaconexion.search(None, f'FROM {correo}')
+    emailsHallados = len(emails)
 
-    mensajes = [x for x in mensajes[0].split()]
+    print(f"Se hallaron {emailsHallados} mails.")
 
-    MensajesHallados = len(mensajes)
+    for email in emails:
 
-    print(f"\n\nSe van a eliminar los correos del email {correo}\n\n")
+        correoActual = Email(nuevaCuenta, email)
 
-    print(f"Se encontraron {MensajesHallados} mensajes\n")
+        nombre = correoActual.getSender()
 
-    mailseliminados = 0
+        if nombre is not None:
 
-    for mail in mensajes:
+            if nombre == correo:
 
-        mailseliminados += 1
-
-        nuevaconexion.store(mail,"+FLAGS", "\\Deleted")
-
-        if mailseliminados % 2 == 0:
+                correoActual.EliminarEmail()
             
-            porcentajeProgreso = (mailseliminados/MensajesHallados)*100
+            mailsEliminados += 1
 
-            print(f"Progreso: {round(porcentajeProgreso, 2)}%")
-    
-    print("Operacion completada!!!")
+            if mailsEliminados % 10 == 0:
 
-    nuevaconexion.expunge()
-
-    nuevaconexion.close()
-
-    nuevaconexion.logout()
+                print(f"{round(mailsEliminados/emailsHallados, 4)*100}% completado")
 
 
-def Eliminar_spam(Claves: dict) -> None:
 
-    nuevaconexion = imaplib.IMAP4_SSL(Claves["proveedor"], int(Claves["puerto"]))
-
-    nuevaconexion.login(Claves["username"], Claves["password"])
-
-    mails = nuevaconexion.select("[Gmail]/Spam")
-
-    Status, mensajes = nuevaconexion.search(None, 'All')
-
-    mensajes = [x for x in mensajes[0].split()]
-
-    MensajesHallados = len(mensajes)
-
-    print(f"\n\nEliminando los correos spam\n\n")
-
-    print(f"Se encontraron {MensajesHallados} mensajes\n")
-
-    mailseliminados = 0
-
-    for mail in mensajes:
-
-        mailseliminados += 1
-
-        nuevaconexion.store(mail,"+FLAGS", "\\Deleted")
-
-        if mailseliminados % 2 == 0:
-            
-            porcentajeProgreso = (mailseliminados/MensajesHallados)*100
-
-            print(f"Progreso: {round(porcentajeProgreso, 2)}%")
-    
-    print("Operacion completada!!!")
-
-    nuevaconexion.expunge()
-
-    nuevaconexion.close()
-
-    nuevaconexion.logout()
-
-
-def Eliminar_Todos_los_emails(Claves: dict) -> None:
+def Eliminar_Todos_los_emails() -> None:
 
     Direcciones = Obtener_correos_spam()
 
@@ -184,7 +123,6 @@ def Eliminar_Todos_los_emails(Claves: dict) -> None:
 
                 print(f"Progreso {round((direcciones_eliminadas/direcciones)*100,2)}%")
 
-        Eliminar_spam()
 
         print("Eliminando archivos temporales")
 

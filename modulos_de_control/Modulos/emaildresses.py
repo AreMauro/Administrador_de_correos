@@ -8,12 +8,12 @@ import email
 
 import imaplib
 
-from modulos_de_control.Modulos.DatosConexion import (
+from DatosConexion import (
                             Carga_de_Datos)
 
 from pprint import pprint
 
-from modulos_de_control.Modulos.Utilerias import (
+from Utilerias import (
                     Mensajes, 
                     clear)
 
@@ -470,7 +470,7 @@ def Clasificacion2(Spam: Path,
 
         return Mensajes[5]
 
-def Obtener_correos_spam(Claves: dict) -> tuple:
+def Obtener_correos_spam() -> tuple:
     
     try:
         print("Obteniendo direcciones...")
@@ -489,22 +489,8 @@ def Obtener_correos_spam(Claves: dict) -> tuple:
                 mode="ab+", dir=Destino, 
                 prefix="spam",
                 delete=False)
- 
-        print("Conectando...")
+    
 
-        nuevaconexion = imaplib.IMAP4_SSL(Claves["proveedor"],Claves["puerto"])
-
-        nuevaconexion.login(Claves["username"], Claves["password"])
-
-        nuevaconexion.select("INBOX")
-
-        print("Buscando...")
-
-        data = nuevaconexion.search(None, "ALL")
-
-        mail_ids = data[1]
-
-        id_list = mail_ids[0].split()
 
         first_email_id = int(id_list[0])
 

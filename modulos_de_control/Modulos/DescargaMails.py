@@ -59,34 +59,6 @@ def Cambiar_nombre(name_file : str,
 
                 return nombre_archivo
 
-def Descargardor(Correo: str,
-                Claves: dict) -> None:
-
-    Folder_destino = Path("C:\\Users\\Ivan\\Downloads\Desktop\\Descargas")
-
-    mail = Imbox(Claves["proveedor"], username=Claves["username"], password=Claves["password"], ssl = True, ssl_context = None, starttls=False)
-
-    messages = mail.messages(sent_from = Correo)
-
-
-    for (uid, mensaje) in messages:
-
-        for idx, attachment in enumerate(mensaje.attachments):
-
-            att_fn = attachment.get("filename")
-
-            file_name = Cambiar_nombre(att_fn,
-                                    Folder_destino)
-
-            print(f"Descargando {file_name} en {Folder_destino}")
-
-            DirDESCARGA = str(Folder_destino)+"\\" + file_name 
-                
-            with open(DirDESCARGA,"wb") as recibo:
-
-                recibo.write(attachment.get("content").read())
-
-    mail.logout()
 
 def Descargar_de_direcciones_validas(
                         Claves: dict) -> None:

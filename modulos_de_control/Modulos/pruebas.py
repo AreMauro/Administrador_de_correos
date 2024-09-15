@@ -1,36 +1,40 @@
 from cuentaCorreo import cuentaDeCorreo
 from Email import Email
-nuevaCuenta = cuentaDeCorreo("enaruto2@gmail.com","Mauro16" ,"xumzfxvpugnjlgqx", "llljjk")
+from eliminarmails import EliminarMailsporFechaycorreo, EliminarMailsporcorreo
+from emailConection import emailConection
 
-nuevaCuenta.proveedor = "gma l"
 
-nuevaCuenta.puerto = 993
+nuevaCuenta = cuentaDeCorreo("enaruto2@gmail.com","Mauro16" ,"xumzfxvpugnjlgqx")
 
-nuevaCuenta.puerto_ssl = 465
+emails = nuevaCuenta.getEmailsByAddress("enaruto2@gmail.com")
 
-nuevaCuenta.smtp = 'smtp.gmail.com'
-
-emails = nuevaCuenta.getEmailsByAddress("updates@academia-mail.com")
+print(f"Emails hallados: {len(emails)}")
 
 
 
-if emails:
-    
-    print(len(emails))
-
-    for email in emails:
-
-        emailnuevo = Email(email, nuevaCuenta)
-
-        print(emailnuevo.getSender())
-
-        emailnuevo.EliminarEmail()
-        
-        emails2 = nuevaCuenta.getEmailsByAddress("updates@academia-mail.com")
-
-        print(len(emails2))
+print(nuevaCuenta.getConection() is nuevaCuenta.getConection())
 
 
-        break;
+for email in emails:
+
+    print (Email(nuevaCuenta, email).getSender())
+
+    break;
+
+print (nuevaCuenta.closeConection())
+
+""""
+enviodeEmails = Email(nuevaCuenta)
+
+correos = nuevaCuenta.getEmailsByAddress("noreply@redditmail.com")
 
 
+#nuevaCuenta.Eliminar_spam("Gmail")
+
+EliminarMailsporFechaycorreo("groupupdates@facebookmail.com", "30-jan-2024",
+                             "enaruto2@gmail.com","Mauro16" ,"xumzfxvpugnjlgqx")
+
+
+EliminarMailsporcorreo("groupupdates@facebookmail.com", 
+                             "enaruto2@gmail.com","Mauro16" ,"xumzfxvpugnjlgqx")
+"""

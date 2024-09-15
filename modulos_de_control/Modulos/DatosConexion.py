@@ -1,6 +1,6 @@
 from pathlib import Path
 from json import dump, load
-from modulos_de_control.Modulos.Utilerias import (
+from Utilerias import (
                         Pedir_informacion,
                         Autorizacion, 
                         Mensajes)
