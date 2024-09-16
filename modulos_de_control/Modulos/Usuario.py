@@ -1,15 +1,17 @@
+import string as strs
+
 class Usuario:
 
     def __init__(self, username, password):
 
         
-        self.USERNAME = username
+        self._username = username
         self._PASS = password
 
     @property
     def username(self) -> str:
 
-        return self.USERNAME
+        return self._username
 
     @property
     def password(self) -> str:
@@ -31,7 +33,7 @@ class Usuario:
 
         if (any(char.isspace() for char in username)) == False and len(username) > 5:
             
-            self.USERNAME = username
+            self._username = username
     
     @password.setter
     def password(self, password: str) -> None:
@@ -46,8 +48,8 @@ class Usuario:
 
     def __str__(self):
 
-        return f"Cuenta: {self.USERNAME}"
+        return f"Cuenta: {self._username}"
     
     def __repr__(self):
         cl = self.__class__.__name__
-        return f"{cl}: usuario = {self.USERNAME}"
+        return f"{cl}: usuario = {self._username}"

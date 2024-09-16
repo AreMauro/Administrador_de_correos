@@ -4,8 +4,27 @@ from Utilerias import (
                         Pedir_informacion,
                         Autorizacion, 
                         Mensajes)
+import sqlite3
+from pathlib import Path
+
 
 Dir = Path("C:\\Users\\Ivan\\Downloads\\Desktop\\Proyectos\\Administrador de Emails\\modulos_de_control\\Modulos\\Datos\\Credenciales.json")
+
+def createDatabase():
+
+    if Path(".\\Datos\\basePrincipal.db").is_file() == False:
+        con = sqlite3.connect(".\\Datos\\basePrincipal.db")
+        cur = con.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS USUARIO(usuario TEXT PRIMARY KEY, password TEXT)")
+        cur.execute("""CREATE TABLE IF NOT EXISTS CUENTACORREO(usuario TEXT PRIMARY KEY,
+                        Correo TEXT, password_de_la_cuenta TEXT, proveedor TEXT, FOREIGN KEY (usuario) 
+                        REFERENCES USUARIO(usuario))""")
+
+
+def insertIntoUsuario(usuario: str, password: str):
+    pass
+
+
 
 def Captura_de_datos(proveedor: str, 
                     username: str) -> dict:

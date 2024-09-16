@@ -46,10 +46,6 @@ class cuentaDeCorreo:
         else:
             raise Exception("Error el smtp es incorrecto")
         
-        self._conexion = emailConection(self._correo, self._password,
-                              self._puerto, self._smtp
-                              ).getConection()
-
         
     @property
     def password(self) ->str:
@@ -152,31 +148,39 @@ class cuentaDeCorreo:
 
     def getConection(self) :
 
-        return self._conexion
-    
-    def closeConection(self) -> tuple:
-        
-        close = self._conexion.close()[0]
+        conexion = emailConection(self._correo, self._password,
+                              self._puerto, self._smtp
+                              ).getConection()
 
-        logout = self._conexion.logout()[0]
-
-        return (close, logout)
+        return conexion 
 
 
     def getEmailsByAddress(self, correo) ->list:
 
-        Status, mensajes = self.getConection().search(None, f'FROM {correo}')
+        conexion = self.getConection()
+
+        Status, mensajes = conexion.search(None, f'FROM {correo}')
 
         mensajes = [x for x in mensajes[0].split()]
+
+        conexion.close()
+
+        conexion.logout()
 
         return mensajes
 
 
     def getAllEmails(self) ->list:
 
-        Status, mensajes = self.getConection().search(None, "ALL")
+        conexion = self.getConection()
+
+        Status, mensajes = conexion.search(None, "ALL")
 
         mensajes = [x for x in mensajes[0].split()]
+
+        conexion.close()
+
+        conexion.logout()
 
         return mensajes
 
@@ -187,9 +191,15 @@ class cuentaDeCorreo:
 
         """
 
-        Status, mensajes = self.getConection().search(None, f'FROM {correo} SINCE {fecha}')
+        conexion = self.getConection()
+
+        Status, mensajes = conexion.search(None, f'FROM {correo} SINCE {fecha}')
 
         mensajes = [x for x in mensajes[0].split()]
+
+        conexion.close()
+
+        conexion.logout()
 
         return mensajes
 
@@ -198,9 +208,16 @@ class cuentaDeCorreo:
         """
             OBTIENE SOLO LOS EMAILS ANTERIORES A UNA FECHA ESPECIFICA
         """
-        Status, mensajes = self.getConection().search(None, f'BEFORE {fecha}')
+
+        conexion = self.getConection()
+
+        Status, mensajes = conexion.search(None, f'BEFORE {fecha}')
 
         mensajes = [x for x in mensajes[0].split()]
+
+        conexion.close()
+
+        conexion.logout()
 
         return mensajes
 
@@ -211,9 +228,15 @@ class cuentaDeCorreo:
             
         """
 
-        Status, mensajes = self.getConection().search(None, f'SINCE {fecha}')
+        conexion = self.getConection()
+
+        Status, mensajes = conexion.search(None, f'SINCE {fecha}')
 
         mensajes = [x for x in mensajes[0].split()]
+
+        conexion.close()
+
+        conexion.logout()
 
         return mensajes
 

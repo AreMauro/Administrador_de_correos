@@ -23,17 +23,20 @@ class Email():
         if isinstance(cuenta, cuentaDeCorreo) == True:
             self._cuenta = cuenta
 
-        self._nuevaConexion = self._cuenta.getConection()
-
 
     def EliminarEmail(self) -> bool:
         
         try:
-            self._nuevaConexion.store(self._number,"+FLAGS", "\\Deleted")
+            
+            conexion = self._cuenta.getConection()
 
-            self._nuevaConexion.expunge()
+            conexion.store(self._number,"+FLAGS", "\\Deleted")
 
-            self._cuenta.closeConection()
+            conexion.expunge()
+
+            conexion.close()
+
+            conexion.logout()
 
             return True
 
@@ -50,20 +53,14 @@ class Email():
                 
                 Path(directorio + "\\" + "descargas_de_emails" ).mkdir(parents=True, exist_ok=True)
             
-            typ, messageParts = self._nuevaConexion.fetch(self._number, '(RFC822)')
+            conexion = self._cuenta.getConection()
+
+            typ, messageParts = conexion.fetch(self._number, '(RFC822)')
             emailBody = messageParts[0][1]
             raw_email_string = emailBody.decode('utf-8')
             mail = email.message_from_string(raw_email_string)#
             print('emailbody complete ...')
             for part in mail.walk():
-                """
-                    if part.get_content_maintype() == 'multipart':
-                        print(part.as_string())
-                        continue;
-                    if part.get('Content-Disposition') is None:
-                        print(part.as_string())
-                        continue
-                """
                 fileName = part.get_filename()
                 print('file names processed ...')
             if bool(fileName):
@@ -75,7 +72,9 @@ class Email():
                     fp.close()
                     print('fp closed ...')
             
-            self._cuenta.closeConection()
+            conexion.close()
+
+            conexion.logout()
 
             return True
         
@@ -197,26 +196,57 @@ class Email():
 
     def getSender(self) ->str:
 
+        conexion = self._cuenta.getConection()
 
-        typ, data = self._nuevaConexion.fetch(self._number,'(RFC822)')
+        typ, data = conexion.fetch(self._number,'(RFC822)')
 
         if data is not None:
+            
+            try:
 
-            msg = email.message_from_bytes(data[0][1])
+                msg = email.message_from_bytes(data[0][1])
+            
+                From, encoding = decode_header(msg.get("From"))[0]
+            
+                if isinstance(From, bytes):
+                    From = From.decode()  
         
-            From, encoding = decode_header(msg.get("From"))[0]
-        
-            if isinstance(From, bytes):
-                From = From.decode()  
-       
-            Sender = email.utils.parseaddr(From)[1]    
+                Sender = email.utils.parseaddr(From)[1] 
 
-            self._cuenta.closeConection()
+                if Sender.find("@") != -1:  
+                    
+                    conexion.close()
 
-            return Sender    
-        
+                    conexion.logout()
+
+                    return Sender
+
+                else: 
+
+                    
+                    conexion.close()
+
+                    conexion.logout()
+                    
+                    return None
+                
+            except TypeError:
+
+                conexion.close()
+
+                conexion.logout()
+                    
+                return None
+                
+
+
         else:
-            self._cuenta.closeConection()
+
+            
+            conexion.close()
+
+            conexion.logout()
+                        
             return None
     
 

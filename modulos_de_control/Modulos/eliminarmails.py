@@ -43,7 +43,11 @@ def EliminarMailsporFechaycorreo(correo: str,
 
         nombre = emailActual.getSender()
 
+        print(nombre)
+
         if nombre == correo:
+
+            print("Eliminando...")
 
             emailActual.EliminarEmail()
 
@@ -71,10 +75,12 @@ def EliminarMailsporcorreo(correo: str,
 
         nombre = correoActual.getSender()
 
+        print(nombre)
+
         if nombre is not None:
 
             if nombre == correo:
-
+                print("Aqui")
                 correoActual.EliminarEmail()
             
             mailsEliminados += 1
@@ -85,9 +91,9 @@ def EliminarMailsporcorreo(correo: str,
 
 
 
-def Eliminar_Todos_los_emails() -> None:
+def Eliminar_Todos_los_emails(cuenta: cuentaDeCorreo) -> None:
 
-    Direcciones = Obtener_correos_spam()
+    Direcciones = Obtener_correos_spam(cuenta)
 
     if Direcciones[0] != Mensajes[5]:
 
@@ -110,11 +116,13 @@ def Eliminar_Todos_los_emails() -> None:
         email = next(Emails, "Vacio")
 
         while  email != "Vacio":
-  
-            EliminarMailsporcorreo(email.rstrip("\n"))
+            
+            print(email)
+
+            EliminarMailsporcorreo(email, cuenta)
 
             direcciones_eliminadas += 1
-
+            
             email = next(Emails, "Vacio")
             
             if direcciones_eliminadas % 10 == 0:
