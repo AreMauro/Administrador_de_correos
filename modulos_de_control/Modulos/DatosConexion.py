@@ -10,22 +10,6 @@ from pathlib import Path
 
 Dir = Path("C:\\Users\\Ivan\\Downloads\\Desktop\\Proyectos\\Administrador de Emails\\modulos_de_control\\Modulos\\Datos\\Credenciales.json")
 
-def createDatabase():
-
-    if Path(".\\Datos\\basePrincipal.db").is_file() == False:
-        con = sqlite3.connect(".\\Datos\\basePrincipal.db")
-        cur = con.cursor()
-        cur.execute("CREATE TABLE IF NOT EXISTS USUARIO(usuario TEXT PRIMARY KEY, password TEXT)")
-        cur.execute("""CREATE TABLE IF NOT EXISTS CUENTACORREO(usuario TEXT PRIMARY KEY,
-                        Correo TEXT, password_de_la_cuenta TEXT, proveedor TEXT, FOREIGN KEY (usuario) 
-                        REFERENCES USUARIO(usuario))""")
-
-
-def insertIntoUsuario(usuario: str, password: str):
-    pass
-
-
-
 def Captura_de_datos(proveedor: str, 
                     username: str) -> dict:
 
@@ -110,51 +94,6 @@ def Guardado_De_datos(username: str) -> str:
 
         quit()
 
-def Carga_de_Datos(username: str) -> dict:
-    """
-    Esta funcion toma los datos del archivo que contiene los datos y los depura
-    
-    SHALLALALALALLALALA
-    """
-    try:
-
-        if Dir.is_file() == True:
-
-            with open(Dir, "r") as F:
-
-                Datos = load(F)
-                    
-            if username in Datos.keys():
-
-                return Datos[username]
-
-            else:
-
-                print(Mensajes[15])
-
-                peticion = Autorizacion(Mensajes[16])
-
-                if peticion == "Y":
-                
-                    Estado = Guardado_De_datos(username)
-
-                    return {1 : Estado}
-
-                else:
-
-                    return {1: ""}
-
-        else:
-
-            Estado = Guardado_De_datos(username)
-
-            return {1 : Estado}
-    
-    except KeyboardInterrupt:
-        
-        print(Mensajes[8])
-
-        quit()
 
 def Actualizar_credenciales():
     

@@ -2,6 +2,7 @@ import sqlite3
 from pathlib import Path
 from Usuario import Usuario
 from cuentaCorreo import cuentaDeCorreo
+from pprint import pprint
 
 class Datos():
     
@@ -145,21 +146,19 @@ class Datos():
             return datos
 
     def getCuentaByCorreo(self, correo:str) -> cuentaDeCorreo:
-
-        try:
-            resultados = self._cur.execute(""" SELECT *
+ 
+        resultados = self._cur.execute(""" SELECT *
                                        FROM CUENTACORREO WHERE correo = ?""", (correo,))
     
-            usuario,correo, password, proveedor = resultados.fetchone()
+        datos  = resultados.fetchone()
 
-            if usuario is not None:
-                return cuentaDeCorreo(correo, usuario, password, proveedor)
+        pprint(datos)
+
+        if datos is not None:
+                return cuentaDeCorreo(datos[1], datos[0], datos[2], datos[3])
             
-            else: return None
+        else: return None
         
-        except TypeError:
-
-            return None
 
     def getAllDataByCorreo(self, correo:str) -> tuple: 
 
@@ -272,7 +271,11 @@ class Datos():
             return not(proveedorActual == proveedorActualizado)
 
 
+    def closeConection(self) -> None:
+        
+        self._cur.close()
 
+        self._con.close()
 
 
 

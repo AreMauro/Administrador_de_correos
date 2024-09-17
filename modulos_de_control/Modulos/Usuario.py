@@ -48,8 +48,8 @@ class Usuario:
 
     def __str__(self):
 
-        return f"Cuenta: {self._username}"
+        return f"Cuenta: {self.username[0]}"
     
     def __repr__(self):
         cl = self.__class__.__name__
-        return f"{cl}: usuario = {self._username}"
+        return f"{cl}: usuario = {self._username[0]}"

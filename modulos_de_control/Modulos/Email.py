@@ -1,7 +1,6 @@
 import imaplib
 import email
 from email.header import decode_header
-from cuentaCorreo import cuentaDeCorreo
 import os
 from pathlib import Path
 import email, smtplib, ssl
@@ -15,13 +14,12 @@ from pathlib import Path
 
 class Email():
 
-    def __init__(self, cuenta: cuentaDeCorreo, mailNumber: bytes =0):
+    def __init__(self, cuenta, mailNumber: bytes =0):
 
         if isinstance(mailNumber, bytes) ==  True:
             self._number = mailNumber
-
-        if isinstance(cuenta, cuentaDeCorreo) == True:
-            self._cuenta = cuenta
+        
+        self._cuenta = cuenta
 
 
     def EliminarEmail(self) -> bool:
@@ -63,6 +61,8 @@ class Email():
             for part in mail.walk():
                 fileName = part.get_filename()
                 print('file names processed ...')
+                print(fileName)
+
             if bool(fileName):
                 filePath = os.path.join(directorio, 'descargas_de_emails', fileName)
                 if not os.path.isfile(filePath):
@@ -78,7 +78,11 @@ class Email():
 
             return True
         
-        except: return False
+        except: 
+            
+            print_exc()
+
+            return False
 
     
     
