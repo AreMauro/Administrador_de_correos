@@ -6,9 +6,11 @@ from baseDeDatos import Datos
 
 nuevaCuenta = cuentaDeCorreo("enaruto2@gmail.com","Mauro16" ,"xumzfxvpugnjlgqx")
 
-nuevaCuenta.DescargarAtachmentsByAddress("enaruto2@gmail.com", ".")
+nuevaCuenta.EliminarMailsporcorreo("comunidadeninfinitum@infinitum.mx")
 
-nuevaCuenta.EliminarMailsporcorreo("messages@facebookmail.com")
+#nuevaCuenta.Eliminar_Todos_los_emails()
+
+
 """"
 enviodeEmails = Email(nuevaCuenta)
 

@@ -40,7 +40,7 @@ class Email():
 
             
         except:
-
+            print_exc()
             return False
 
     
@@ -52,13 +52,22 @@ class Email():
                 Path(directorio + "\\" + "descargas_de_emails" ).mkdir(parents=True, exist_ok=True)
             
             conexion = self._cuenta.getConection()
-
+            fileName = ""
             typ, messageParts = conexion.fetch(self._number, '(RFC822)')
             emailBody = messageParts[0][1]
             raw_email_string = emailBody.decode('utf-8')
             mail = email.message_from_string(raw_email_string)#
             print('emailbody complete ...')
+            
             for part in mail.walk():
+
+                if part.get_content_maintype() == 'multipart':
+                    
+                    continue;
+                if part.get('Content-Disposition') is None:
+                    
+                    continue;
+                
                 fileName = part.get_filename()
                 print('file names processed ...')
                 print(fileName)
@@ -89,7 +98,7 @@ class Email():
     def Plantilla_para_archivos_propios(self, 
                 Archivos:list) -> str:
 
-        Raiz = ".\\Datos\\Plantillas"
+        Raiz = ".\\modulos_de_control\\Modulos\\Datos\\Plantillas"
 
         Plantilla = Path(Raiz, "Plantilla_1.html")
 

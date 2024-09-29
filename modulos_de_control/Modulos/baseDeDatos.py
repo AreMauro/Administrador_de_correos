@@ -1,16 +1,26 @@
 import sqlite3
 from pathlib import Path
-from Usuario import Usuario
-from cuentaCorreo import cuentaDeCorreo
+from modulos_de_control.Modulos.Usuario import Usuario
+from modulos_de_control.Modulos.cuentaCorreo import cuentaDeCorreo
+from traceback import print_exc
 from pprint import pprint
+from os import makedirs, utime
 
 class Datos():
     
     def __init__(self) -> None:
         
-        if Path(".\\Datos\\basePrincipal.db").is_file() == False:
+
+        baseDeDatos = Path(".\\modulos_de_control\\Modulos\\Datos\\basePrincipal.db")
+
+        if baseDeDatos.is_file() == False:
             
-            self._con = sqlite3.connect(".\\Datos\\basePrincipal.db")
+            with open(baseDeDatos, 'a'):
+                utime(baseDeDatos, None)
+
+            print("Aqui")
+            
+            self._con = sqlite3.connect(baseDeDatos)
             self._cur = self._con.cursor()
             self._cur.execute("""CREATE TABLE IF NOT EXISTS USUARIO(usuario TEXT PRIMARY KEY,
                                password TEXT)""")
@@ -22,7 +32,9 @@ class Datos():
 
         else:
 
-            self._con = sqlite3.connect(".\\Datos\\basePrincipal.db")
+            print("Existe")
+
+            self._con = sqlite3.connect(baseDeDatos)
             self._con.execute("PRAGMA foreign_keys = ON")
             self._cur = self._con.cursor()
 
@@ -69,6 +81,8 @@ class Datos():
         
     def getUsuario(self, usuario: str) -> Usuario:
 
+        print(usuario)
+
         resultados = self._cur.execute(""" SELECT usuario, password FROM Usuario WHERE Usuario = ?""", (usuario,))
     
         usuario = resultados.fetchone()
@@ -97,6 +111,8 @@ class Datos():
             return True
         except sqlite3.IntegrityError:
 
+            print_exc()
+
             print("Cuenta ya registrada...")
             return False
 
@@ -112,9 +128,13 @@ class Datos():
                 return cuentaDeCorreo(correo, usuario, password, proveedor)
             else: return None
         
-        except TypeError:
+        except:
+
+            print_exc()
 
             return None
+
+
 
     def getAllUserData(self, usuario:str) -> tuple:
 
@@ -208,6 +228,8 @@ class Datos():
 
                 return not(contrasegnaActual == contrasegnaActualizada)
             except:
+
+                print_exc()
 
                 return None
         else: 

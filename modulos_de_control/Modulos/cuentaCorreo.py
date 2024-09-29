@@ -2,14 +2,14 @@ import re
 import imaplib
 from pathlib import Path
 from json import load, JSONDecodeError, dump
-from emailConection import emailConection
-from Utilerias import Mensajes
+from modulos_de_control.Modulos.emailConection import emailConection
+from modulos_de_control.Modulos.Utilerias import Mensajes, clear
 from pprint import pprint
-from Email import Email
+from modulos_de_control.Modulos.Email import Email
 from traceback import print_exc
 from shutil import rmtree
 from tempfile import mkdtemp, NamedTemporaryFile
-from Utilerias import clear
+
 
 class cuentaDeCorreo:
 
@@ -551,7 +551,7 @@ class cuentaDeCorreo:
     def Actualizar_direcciones_validas(self) -> None :
 
         DireccionesAlmacenadas = Path( 
-                    ".\\Datos\\Direcciones de correo")
+                    ".\\modulos_de_control\\Modulos\\Datos\\Direcciones de correo")
 
         self.Eliminar_Archivos_Temporales(DireccionesAlmacenadas)
 
@@ -574,108 +574,6 @@ class cuentaDeCorreo:
         else:
 
             print(Mensajes[5])
-
-
-    def Clasificacion2(self, Spam: Path,
-                   Direcciones: set) -> str:
-
-        CorreosValidos= Path(
-                    ".\\Datos\\Direcciones de correo\\Direcciones Validas.json")
-
-        if CorreosValidos.is_file() == False:
-        
-            self.Actualizar_direcciones_validas()
-
-
-        Dictvalidos = self.Cargar_Datos(CorreosValidos)
-
-        if Dictvalidos[0] != "":
-
-            for email in Direcciones:
-            
-                if email not in Dictvalidos[0].values() and email is not None:
-
-                    with open(Spam, "ab+") as sp:
-                        
-                        sp.write(bytes(email, "utf8"))
-
-                        sp.write(b"\n")
-                
-            return Mensajes[7]
-    
-        else:
-
-            return Mensajes[5]
-
-    def Obtener_correos_spam(self) -> tuple:
-        
-        try:
-            print("Obteniendo direcciones...")
-            
-            print("Creando archivos temporales...")
-
-            Direcciones = set()
-
-            Aqui = Path(".\\Datos\\")
-
-            Dir = mkdtemp(dir=Aqui)
-
-            Destino = Path(str(Dir))
-
-            Spam = NamedTemporaryFile(
-                    mode="ab+", dir=Destino, 
-                    prefix="spam",
-                    delete=False)
-
-            emails = self.getAllEmails()
-
-            last_email_id = int(emails[-1]) + 1
-
-            print(f"Se encontraron {last_email_id} mails")
-
-            contadormails = 0
-
-            for email in emails:
-
-                emailActual = Email(self, email)
-
-                direccion = emailActual.getSender()
-
-                Direcciones.add(direccion)
-
-                contadormails += 1
-
-                print(contadormails)
-    
-                if contadormails % 200 == 0:
-                    
-                    print("Clasificando...")
-
-                    direcciones_Spam = Path(Spam.name)
-                    
-                    Estado = self.Clasificacion2(direcciones_Spam, 
-                        Direcciones)
-
-                    Direcciones.clear()
-
-                    clear()
-
-                    print(f"Progreso: {round((contadormails/last_email_id)*100)}%...")
-
-            print(Mensajes[7])
-
-            print("Cerrando sesion...")
-
-            return (Spam.name,)
-        
-        except KeyboardInterrupt: 
-
-            print(Mensajes[8])
-
-        except:
-            
-            print_exc()
-            return (Mensajes[5],)
 
     
     def EliminarMailsporFechaycorreo(self, correo: str,
@@ -746,51 +644,46 @@ class cuentaDeCorreo:
 
     def Eliminar_Todos_los_emails(self) -> None:
 
-        Direcciones = self.Obtener_correos_spam()
+        CorreosValidos= Path(
+                    ".\\modulos_de_control\\Modulos\\Datos\\Direcciones de correo\\Direcciones Validas.json")
 
-        if Direcciones[0] != Mensajes[5]:
+        if CorreosValidos.is_file() == False:
+        
+            self.Actualizar_direcciones_validas()
 
-            print("Obteniendo direcciones spam...")
+        Dictvalidos = self.Cargar_Datos(CorreosValidos)
 
-            spam = Path(Direcciones[0])
+        emails = self.getAllEmails()
 
-            directorio = Path("\\".join(str(spam.resolve()).split("\\")[:-1]))
+        emailsHallados = len(emails)
 
-            direcciones_basura = set(open(spam).readlines())
+        print(f"Se encontraron {emailsHallados} mails")
 
-            direcciones = len(direcciones_basura)
+        contadormails = 0
 
-            direcciones_eliminadas = 0
+        for email in emails:
 
-            print("Eliminando direcciones...")
-
-            Emails = iter(direcciones_basura)
-
-            email = next(Emails, "Vacio")
-
-            while  email != "Vacio":
+            if Dictvalidos[0] != "":
                 
-                print(email)
+                emailActual = Email(self, email)
 
-                self.EliminarMailsporcorreo(email)
+                direccion = emailActual.getSender()
 
-                direcciones_eliminadas += 1
-                
-                email = next(Emails, "Vacio")
-                
-                if direcciones_eliminadas % 10 == 0:
+                print(direccion, contadormails) 
 
-                    clear()
+                if direccion not in Dictvalidos[0].values() and direccion is not None:
 
-                    print(f"Progreso {round((direcciones_eliminadas/direcciones)*100,2)}%")
+                   self.EliminarMailsporcorreo(direccion)
+            
+            contadormails += 1
 
+            if contadormails % 200 == 0:
 
-            print("Eliminando archivos temporales")
+                clear()
 
-            self.Eliminar_Archivos_Temporales(directorio)
+                print(f"Progreso: {round((contadormails/emailsHallados)*100, 4)}%...")
 
-            print("Operacion completada con exito!!!")
-
+              
     def enviarEmailConAtachments(self, ruta:str, Destinatario:str, subject: str) ->None:
 
         nuevoEmial = Email(self)
@@ -798,6 +691,9 @@ class cuentaDeCorreo:
         nuevoEmial.Enviar_mail(Destinatario, subject, ruta)
 
     def DescargarAtachmentsByAddress(self, correo:str, ruta:str) -> bool:
+
+        
+
 
         for email in self.getEmailsByAddress(correo):
 
@@ -807,7 +703,7 @@ class cuentaDeCorreo:
 
             resultado = emailActual.descargarContenido(ruta)
 
-            return resultado
+        
 
     def descargarAtachmentsByAddressAndSubject(self) -> None: pass
 

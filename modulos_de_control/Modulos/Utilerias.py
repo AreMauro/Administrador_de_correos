@@ -15,7 +15,6 @@ Mensajes = {1 : "Dame la contraseña de la aplicacion gmail: ",
                 Oprime E para eliminar Emails.
                 Oprime D para descargar Emails.
                 Oprime A para actualizar informacion.
-                Oprime C para cambiar de cuenta.
                 Escribe exit para salir.
                 """,
             11: "Desea salir del programa?",
@@ -36,7 +35,15 @@ Mensajes = {1 : "Dame la contraseña de la aplicacion gmail: ",
                 D para descargar todos los mails de la lista de validos.
                 C para descargar todos correos de una direccion valida.
                 """,
-           
+            20: "Desea registrar al nuevo usuario.",
+            21: """
+                    Elija alguna de las siguientes opciones:
+                    C para cambiar la contraseña del usuario.
+                    D para cambiar la contraseña de la aplicacion.
+                    P para cambiar el correo electronico.
+                    F para cambiar el proveedor.
+                    T para ver toda la informacion del usuario.
+                """,
 
             }
 
