@@ -1,0 +1,20 @@
+#Paths que se van a ignorar:
+
+modulos_de_control/__pycache__/*
+
+modulos_de_control/Modulos/Datos/Direcciones de correo/*
+
+modulos_de_control/Modulos/Datos/Credenciales.json
+
+modulos_de_control/Modulos/Datos/Patrones.json
+
+modulos_de_control/Modulos/__pycache__/*
+
+Proyecto Email/*
+
+Sobre el proyecto/*
+
+modulos_de_control/Modulos/Datos/*.db
+modulos_de_control/Modulos/Datos/tmp*
+modulos_de_control/Modulos/Datos/basePrincipal.db
+
